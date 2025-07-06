@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- xml -->
+
+<mapper namespace="com.yaas.recodercodereviewservice.repository.IReviewListMapper">
+
+    <!-- : Mentees - reviewCount -->
+    <select id="getAllMentees" resultType="com.yaas.recodercodereviewservice.dto.MenteeListDto" parameterType="map">
+        select count(review_id) as reviewCount, review_language as reviewLanguage
+        from review_tb
+        where room_id=#{roomId}
+            and mentee_id=#{menteeId}
+    </select>
+
+    <!-- : Code List -->
+    <select id="getAllReviews" resultType="com.yaas.recodercodereviewservice.dto.ReviewListDto" parameterType="long">
+        select review_id as reviewId,
+               room_id as roomId,
+               mentor_id as mentorId,
+               mentee_id as menteeId,
+               review_title as reviewTitle,
+               review_reg_date as reviewRegDate,
+               review_code_path as reviewCodePath
+        from review_tb
+        where room_id=#{roomId}
+    </select>
+
+    <!-- -->
+    <select id="getAllMenteeReviews" resultType="com.yaas.recodercodereviewservice.dto.MenteeReviewListDto" parameterType="long">
+        select review_id as reviewId,
+               room_id as roomId,
+               mentor_id as mentorId,
+               mentee_id as menteeId,
+               review_title as reviewTitle,
+               review_reg_date as reviewRegDate,
+               review_code_path as reviewCodePath
+        from review_tb
+        where mentee_id=#{menteeId}
+    </select>
+
+    <!-- -->
+    <delete id="deleteReviewAuto" parameterType="long">
+        delete from review_tb where review_id=#{reviewId}
+    </delete>
+
+</mapper>

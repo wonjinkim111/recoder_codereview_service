@@ -1,0 +1,43 @@
+server:
+  port: 30000
+
+spring:
+  application:
+    name: codereview-service
+
+  devtools:
+    restart:
+      enabled: true
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/code_review?serverTimezone=UTC&characterEncoding=UTF-8&allowMultiQueries=true
+    username: root
+    password: test1234
+    #    password: '{cipher}AQAaScBnZGZqWAmXW6mzVu39iZ8CNRTRwezDsOlDEQNPguJHYfvZ7vEXz0pie80/UMVzHDKyFXrLKBdwxhp81ycTPQ39+ToZumh4533u8aqVfJApsdOxoDS1cbESjkcjW1kpmOuPylKA70u1eopsrjkvjTihW47wuLmsfI/ZCy6rv9Sn8jedCm+/06Lt1oycTYjdQ9DqceJIpWXqfNT0eIeg2KORg/F3DpSUFFI+lP1sgeoO2n3yt9rhTfWzzp2QX4ml+au0xqQKyyGIKQcywzGr1X9p8IwizcD5dMfklQVIupIWzLf7nzxuFrPOGN1wFdBHLcrnXYdeMezmWEK8C5CECKnmDMa/H1RdUmojz6DVXJfuK3qmDoo5VJBFr5FXw3c='
+    driver: com.mysql.jdbc.Driver
+
+  # file upload
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 200MB
+      max-request-size: 215MB
+
+
+mybatis:
+  type-aliases-package: com.yaas.recodercodereviewservice.entity
+  mapper-locations: mapper/**/*.xml
+
+ribbon:
+  ReadTimeout: 60000
+  ConnectTimeout: 60000
+
+token:
+  expiration_time: 86400000
+  secret: recoder_secret
+
+authorization:
+  token:
+    header:
+      name: Authorization
+      prefix: Bearer

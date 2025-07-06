@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- xml -->
+
+<mapper namespace="com.yaas.recodercodereviewservice.repository.ICompileMapper">
+
+    <select id="getCodePath" resultType="com.yaas.recodercodereviewservice.dto.CompileDto" parameterType="long">
+        select review_code_path as reviewCodePath
+        from review_tb
+        where review_id=#{reviewId}
+    </select>
+
+</mapper>

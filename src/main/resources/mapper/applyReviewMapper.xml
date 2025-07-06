@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- xml -->
+
+<mapper namespace="com.yaas.recodercodereviewservice.repository.IApplyReviewMapper">
+
+    <!-- -->
+    <insert id="applyReview" useGeneratedKeys="true" keyProperty="reviewId" parameterType="com.yaas.recodercodereviewservice.entity.Reviews">
+        insert into review_tb(review_id, room_id, mentor_id, mentee_id, review_title, review_content, review_code_path, review_language, review_reg_date)
+        values(#{reviewId}, #{roomId}, #{mentorId}, #{menteeId}, #{reviewTitle}, #{reviewContent}, #{reviewCodePath}, #{reviewLanguage}, DATE_FORMAT(now(), '%Y/%m/%d %H:%i:%s'))
+    </insert>
+
+    <!-- -->
+    <select id="getApplyReview" resultType="com.yaas.recodercodereviewservice.dto.ReviewDto" parameterType="long">
+        select review_id as reviewId,
+               room_id as roomId,
+               mentor_id as mentorId,
+               mentee_id as menteeId,
+               review_title as reviewTitle,
+               review_content as reviewContent,
+               review_code_path as reviewCodePath,
+               review_language as reviewLanguage,
+               review_reg_date as reviewRegDate
+        from review_tb
+        where review_id=#{reviewId}
+    </select>
+
+    <!-- codePath -->
+    <update id="updateCodePath" parameterType="map">
+        update review_tb set review_code_path=#{reviewCodePath}
+        where review_id=#{reviewId}
+    </update>
+
+</mapper>
