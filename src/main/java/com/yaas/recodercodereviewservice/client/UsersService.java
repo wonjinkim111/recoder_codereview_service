@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@FeignClient(url = "http://localhost:10000", name = "users-service")
+@FeignClient(url = "http://192.168.1.20:32513", name = "users-service")
 public interface UsersService {
     @GetMapping({"/users/mentee/nickname"})
     UmenteeNicknameModel getMenteeNickname(@RequestParam long menteeId);
