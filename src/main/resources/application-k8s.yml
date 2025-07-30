@@ -1,0 +1,46 @@
+server:
+  port: 30000
+
+spring:
+  application:
+    name: codereview-service
+
+  devtools:
+    restart:
+      enabled: true
+
+  datasource:
+    url: jdbc:mysql://mysql:3306/code_review?serverTimezone=UTC&characterEncoding=UTF-8&allowMultiQueries=true
+    username: root
+    password: mysql
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  cloud:
+    kubernetes:
+      discovery:
+        all-namespaces: true
+
+  # file upload
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 200MB
+      max-request-size: 215MB
+
+mybatis:
+  type-aliases-package: com.yaas.recodercodereviewservice.entity
+  mapper-locations: mapper/**/*.xml
+
+ribbon:
+  ReadTimeout: 60000
+  ConnectTimeout: 60000
+
+token:
+  expiration_time: 86400000
+  secret: recoder_secret
+
+authorization:
+  token:
+    header:
+      name: Authorization
+      prefix: Bearer
