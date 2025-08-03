@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @CrossOrigin
@@ -35,7 +36,7 @@ public class CompileController1 {
 
     @GetMapping({"/compile/{reviewId}"})
     @ResponseBody
-    public String getResult(@PathVariable long reviewId) {
+    public String getResult(@RequestParam long reviewId) {
         System.out.println("컴파일 컨트롤러 탔다!! ");
         CompileDto compileDto = this.iCompileService.getCodePath(reviewId);
         CompileProcess var10000 = this.compileProcess;
@@ -47,7 +48,7 @@ public class CompileController1 {
 
     @GetMapping({"/compilewindow/{reviewId}"})
     @ResponseBody
-    public String getResultWindow(@PathVariable long reviewId) {
+    public String getResultWindow(@RequestParam long reviewId) {
         System.out.println("컴파일 컨트롤러 탔다!! ");
         CompileDto compileDto = this.iCompileService.getCodePath(reviewId);
         CompileProcess3 var10000 = this.compileProcess3;
@@ -70,7 +71,7 @@ public class CompileController1 {
 
     @GetMapping({"/compile3/{codePath}"})
     @ResponseBody
-    public String getComment2(@PathVariable String codePath) {
+    public String getComment2(@RequestParam String codePath) {
         System.out.println("컴파일 컨트롤러 3 탔다!! ");
         CompileProcess3 var10000 = this.compileProcess3;
         String successResult = CompileProcess3.execute(codePath);
