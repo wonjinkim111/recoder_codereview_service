@@ -76,13 +76,13 @@ public class ApplyReviewController {
             System.out.println("파일은? " + file + " >> 파일이름은? " + this.filename);
             String codePath;
             if (reviews.getReviewLanguage() == 0) {
-                codePath = "C:\\Users\\diffr\\recoder\\java";
+                codePath = "/usr/src/recoder/java/";
                 file.transferTo(new File(codePath + reviews.getMenteeId() + "_" + this.filename));
             } else if (reviews.getReviewLanguage() == 1) {
-                codePath = "C:\\Users\\diffr\\recoder\\c";
+                codePath = "/usr/src/recoder/c/";
                 file.transferTo(new File(codePath + reviews.getMenteeId() + "_" + this.filename));
             } else {
-                codePath = "C:\\Users\\diffr\\recoder\\cpp";
+                codePath = "/usr/src/recoder/cpp/";
                 file.transferTo(new File(codePath + reviews.getMenteeId() + "_" + this.filename));
             }
         } catch (Exception var6) {
@@ -103,16 +103,16 @@ public class ApplyReviewController {
         this.getReviewDto = this.iApplyReviewService.getApplyReview(reviewId);
         String getFile;
         if (this.getReviewDto.getReviewLanguage() == 0) {
-            getFile = this.fileGet.getFile("c:\\Users\\diffr\\recoder\\java" + this.getReviewDto.getReviewCodePath());
+            getFile = this.fileGet.getFile("/usr/src/recoder/java/" + this.getReviewDto.getReviewCodePath());
             this.getReviewDto.setReviewCode((String)null);
             this.getReviewDto.setReviewCode(getFile);
         } else if (this.getReviewDto.getReviewLanguage() == 1) {
-            //getFile = this.fileGet.getFile("/usr/src/recoder/c/" + this.getReviewDto.getReviewCodePath());
-        	getFile = this.fileGet.getFile("C:\\Users\\diffr\\recoder\\c" + this.getReviewDto.getReviewCodePath());
+            getFile = this.fileGet.getFile("/usr/src/recoder/c/" + this.getReviewDto.getReviewCodePath());
+        	//getFile = this.fileGet.getFile("C:\\Users\\diffr\\recoder\\c" + this.getReviewDto.getReviewCodePath());
         	this.getReviewDto.setReviewCode((String)null);
             this.getReviewDto.setReviewCode(getFile);
         } else {
-            getFile = this.fileGet.getFile("c:\\Users\\diffr\\recoder\\cpp" + this.getReviewDto.getReviewCodePath());
+            getFile = this.fileGet.getFile("/usr/src/recoder/cpp/" + this.getReviewDto.getReviewCodePath());
             this.getReviewDto.setReviewCode((String)null);
             this.getReviewDto.setReviewCode(getFile);
         }
