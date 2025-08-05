@@ -97,7 +97,7 @@ public class ApplyReviewController {
 
     @GetMapping({"/linux/{reviewId}"})
     @ResponseBody
-    public ReviewDto getReview(@RequestParam long reviewId) {
+    public ReviewDto getReview(@PathVariable long reviewId) {
         System.out.println("가져올 리뷰의 아이디는? " + reviewId);
         this.modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         this.getReviewDto = this.iApplyReviewService.getApplyReview(reviewId);
@@ -123,7 +123,7 @@ public class ApplyReviewController {
 
     @GetMapping({"/{reviewId}"})
     @ResponseBody
-    public ReviewDto getReviewLinux(@RequestParam long reviewId) {
+    public ReviewDto getReviewLinux(@PathVariable long reviewId) {
         this.modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         this.getReviewDto = this.iApplyReviewService.getApplyReview(reviewId);
         System.out.println(this.getReviewDto.getReviewCodePath());

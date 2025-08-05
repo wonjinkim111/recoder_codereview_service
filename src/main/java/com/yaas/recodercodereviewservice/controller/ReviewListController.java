@@ -43,7 +43,7 @@ public class ReviewListController {
 
     @GetMapping({"/list/{roomId}"})
     @ResponseBody
-    public List<ReviewListDto> getAllReviews(@RequestParam long roomId) {
+    public List<ReviewListDto> getAllReviews(@PathVariable long roomId) {
         int cnt = 0;
         List<ReviewListDto> returnValue = new ArrayList();
         List<ReviewListDto> reviews = this.iReviewListService.getAllReviews(roomId);
@@ -68,7 +68,7 @@ public class ReviewListController {
 
     @GetMapping({"/mentee/{menteeId}"})
     @ResponseBody
-    public List<MenteeReviewListDto> getAllMenteeReviews(@RequestParam long menteeId) {
+    public List<MenteeReviewListDto> getAllMenteeReviews(@PathVariable long menteeId) {
         int cnt = 0;
         List<MenteeReviewListDto> returnValue = new ArrayList();
         List<MenteeReviewListDto> reviews = this.iReviewListService.getAllMenteeReviews(menteeId);
