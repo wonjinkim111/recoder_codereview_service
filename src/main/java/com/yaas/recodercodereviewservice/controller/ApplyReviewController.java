@@ -137,7 +137,7 @@ public class ApplyReviewController {
         	//getFile = this.fileGet.getFile("C:\\Users\\diffr\\recoder\\c" + this.getReviewDto.getReviewCodePath());
         	log.info(String.format(">>> c 코드는?? %s", this.getReviewDto.getReviewCode()));
         } else {
-        	getFile = this.fileGet.getFile("/usr/src/recoder/java/" + this.getReviewDto.getReviewCodePath());
+        	getFile = this.fileGet.getFile("/usr/src/recoder/cpp/" + this.getReviewDto.getReviewCodePath());
             //getFile = this.fileGet.getFile("C:\\Users\\diffr\\recoder\\cpp" + this.getReviewDto.getReviewCodePath());
             log.info(String.format(">>> cpp 코드는?? %s", this.getReviewDto.getReviewCode()));
         }
