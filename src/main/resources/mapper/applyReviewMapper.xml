@@ -2,36 +2,52 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-
-<!-- xml -->
-
 <mapper namespace="com.yaas.recodercodereviewservice.repository.IApplyReviewMapper">
 
-    <!-- -->
-    <insert id="applyReview" useGeneratedKeys="true" keyProperty="reviewId" parameterType="com.yaas.recodercodereviewservice.entity.Reviews">
-        insert into review_tb(review_id, room_id, mentor_id, mentee_id, review_title, review_content, review_code_path, review_language, review_reg_date)
-        values(#{reviewId}, #{roomId}, #{mentorId}, #{menteeId}, #{reviewTitle}, #{reviewContent}, #{reviewCodePath}, #{reviewLanguage}, DATE_FORMAT(now(), '%Y/%m/%d %H:%i:%s'))
+    <!-- 리뷰 생성 -->
+    <insert id="applyReview" useGeneratedKeys="true" keyProperty="reviewId"
+            parameterType="com.yaas.recodercodereviewservice.entity.Reviews">
+        INSERT INTO review_tb(
+            room_id,
+            mentor_id,
+            mentee_id,
+            review_title,
+            review_content,
+            review_code_path,
+            review_language,
+            review_reg_date
+        ) VALUES (
+            #{roomId},
+            #{mentorId},
+            #{menteeId},
+            #{reviewTitle},
+            #{reviewContent},
+            NULL,
+            #{reviewLanguage},
+            NOW()
+        )
     </insert>
 
-    <!-- -->
+    <!-- 특정 리뷰 조회 -->
     <select id="getApplyReview" resultType="com.yaas.recodercodereviewservice.dto.ReviewDto" parameterType="long">
-        select review_id as reviewId,
-               room_id as roomId,
-               mentor_id as mentorId,
-               mentee_id as menteeId,
-               review_title as reviewTitle,
-               review_content as reviewContent,
-               review_code_path as reviewCodePath,
-               review_language as reviewLanguage,
-               review_reg_date as reviewRegDate
-        from review_tb
-        where review_id=#{reviewId}
+        SELECT review_id       AS reviewId,
+               room_id         AS roomId,
+               mentor_id       AS mentorId,
+               mentee_id       AS menteeId,
+               review_title    AS reviewTitle,
+               review_content  AS reviewContent,
+               review_code_path AS reviewCodePath,
+               review_language AS reviewLanguage,
+               review_reg_date AS reviewRegDate
+        FROM review_tb
+        WHERE review_id = #{reviewId}
     </select>
 
-    <!-- codePath -->
+    <!-- 코드 경로 업데이트 -->
     <update id="updateCodePath" parameterType="map">
-        update review_tb set review_code_path=#{reviewCodePath}
-        where review_id=#{reviewId}
+        UPDATE review_tb
+        SET review_code_path = #{reviewCodePath}
+        WHERE review_id = #{reviewId}
     </update>
 
 </mapper>
