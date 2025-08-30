@@ -30,8 +30,8 @@ public class FileSaveLinux {
                 this.writer(reviews, fw);
             } else if (reviews.getReviewLanguage() == 1) {
                 fileName = reviewId + "_" + reviews.getMenteeId() + "_" + timeStamp + ".c";
-                //fw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("/usr/src/recoder/c/" + fileName), "UTF-8"));
-                fw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("C:\\Users\\diffr\recoder" + fileName), "UTF-8"));
+                fw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("/usr/src/recoder/c/" + fileName), "UTF-8"));
+                //fw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("C:\\Users\\diffr\recoder" + fileName), "UTF-8"));
                 this.writer(reviews, fw);
             } else {
                 fileName = reviewId + "_" + reviews.getMenteeId() + "_" + timeStamp + ".cpp";
