@@ -72,8 +72,7 @@ public class ApplyReviewController {
         params.put("reviewCodePath", filePath);
 
         int updated = this.iApplyReviewService.updateCodePath(params);
-        log.info("[applyReview] updateCodePath 결과: updated={}, reviewId={}, codePath={}",
-                 updated, created.getReviewId(), filePath);
+        log.info("[applyReview] 저장된 파일명(filePath)={}, update 결과={}", filePath, updated);
 
         // DTO에도 반영
         created.setReviewCodePath(filePath);
