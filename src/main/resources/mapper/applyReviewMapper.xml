@@ -4,29 +4,10 @@
 
 <mapper namespace="com.yaas.recodercodereviewservice.repository.IApplyReviewMapper">
 
-    <!-- 리뷰 생성 -->
-    <insert id="applyReview" useGeneratedKeys="true" keyProperty="reviewId"
-            parameterType="com.yaas.recodercodereviewservice.entity.Reviews">
-        INSERT INTO review_tb(
-            room_id,
-            mentor_id,
-            mentee_id,
-            review_title,
-            review_content,
-            review_code_path,
-            review_language,
-            review_reg_date
-        ) VALUES (
-            #{roomId},
-            #{mentorId},
-            #{menteeId},
-            #{reviewTitle},
-            #{reviewContent},
-            NULL,
-            #{reviewLanguage},
-            NOW()
-        )
-    </insert>
+	<insert id="applyReview" useGeneratedKeys="true" keyProperty="reviewId" parameterType="com.yaas.recodercodereviewservice.entity.Reviews">
+    	insert into review_tb(room_id, mentor_id, mentee_id, review_title, review_content, review_code_path, review_language, review_reg_date)
+    	values(#{roomId}, #{mentorId}, #{menteeId}, #{reviewTitle}, #{reviewContent}, '', #{reviewLanguage}, now())
+	</insert>
 
     <!-- 특정 리뷰 조회 -->
     <select id="getApplyReview" resultType="com.yaas.recodercodereviewservice.dto.ReviewDto" parameterType="long">

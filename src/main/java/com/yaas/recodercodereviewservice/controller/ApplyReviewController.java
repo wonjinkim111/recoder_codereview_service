@@ -60,6 +60,8 @@ public class ApplyReviewController {
         Map<Object, Object> updateCodePathMap = new HashMap();
         updateCodePathMap.put("reviewCodePath", filePath);
         updateCodePathMap.put("reviewId", createReviewDto.getReviewId());
+        log.info(">>> updateCodePath 호출 직전: reviewId={}, reviewCodePath={}", 
+        	    updateCodePathMap.get("reviewId"), updateCodePathMap.get("reviewCodePath"));
         this.iApplyReviewService.updateCodePath(updateCodePathMap);
         createReviewDto.setReviewCodePath(filePath);
         CreateReviewResponseModel returnValue = (CreateReviewResponseModel)this.modelMapper.map(createReviewDto, CreateReviewResponseModel.class);
