@@ -24,17 +24,27 @@ public class ApplyReviewServiceImpl implements IApplyReviewService {
         this.iApplyReviewMapper = iApplyReviewMapper;
         this.usersService = usersService;
     }
-
+    
+    @Override
     public ReviewDto applyReview(ReviewDto reviewDto) {
-        ModelMapper modelMapper = new ModelMapper();
-        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-        Reviews reviewEntity = (Reviews)modelMapper.map(reviewDto, Reviews.class);
-        System.out.println("review 테이블 생성");
-        this.iApplyReviewMapper.applyReview(reviewEntity);
-        ReviewDto returnValue = (ReviewDto)modelMapper.map(reviewEntity, ReviewDto.class);
+        ModelMapper mm = new ModelMapper();
+        mm.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+
+        Reviews entity = mm.map(reviewDto, Reviews.class);
+
+        // INSERT
+        iApplyReviewMapper.applyReview(entity);
+
+        // INSERT 후 reviewId 확인 (useGeneratedKeys 로 들어와야 함)
+        log.info("[applyReviewService] INSERT된 reviewId={}", entity.getReviewId());
+
+        ReviewDto returnValue = mm.map(entity, ReviewDto.class);
+
+        // (유저 서비스 연동 부분은 그대로)
         log.info("유저 >>> Before calling users microservice");
-        int updateMenteeRoomId = this.usersService.enrollReview(returnValue.getMenteeId(), returnValue.getRoomId());
+        usersService.enrollReview(returnValue.getMenteeId(), returnValue.getRoomId());
         log.info("유저 >>> After calling users microservice");
+
         return returnValue;
     }
 

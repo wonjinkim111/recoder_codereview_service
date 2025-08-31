@@ -53,18 +53,34 @@ public class ApplyReviewController {
     @PostMapping
     public ResponseEntity<CreateReviewResponseModel> applyReview(@RequestBody Reviews reviews) {
         this.modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-        ReviewDto reviewDto = (ReviewDto)this.modelMapper.map(reviews, ReviewDto.class);
-        System.out.println("받은 코드 " + reviews.getReviewCode());
-        ReviewDto createReviewDto = this.iApplyReviewService.applyReview(reviewDto);
-        String filePath = this.fileSave.setFileStore(reviews, createReviewDto.getReviewId());
-        Map<Object, Object> updateCodePathMap = new HashMap();
-        updateCodePathMap.put("reviewCodePath", filePath);
-        updateCodePathMap.put("reviewId", createReviewDto.getReviewId());
-        log.info(">>> updateCodePath 호출 직전: reviewId={}, reviewCodePath={}", 
-        	    updateCodePathMap.get("reviewId"), updateCodePathMap.get("reviewCodePath"));
-        this.iApplyReviewService.updateCodePath(updateCodePathMap);
-        createReviewDto.setReviewCodePath(filePath);
-        CreateReviewResponseModel returnValue = (CreateReviewResponseModel)this.modelMapper.map(createReviewDto, CreateReviewResponseModel.class);
+        
+        // DTO 변환
+        ReviewDto reviewDto = this.modelMapper.map(reviews, ReviewDto.class);
+        log.info("[applyReview] 받은 코드: {}", reviews.getReviewCode());
+
+        // INSERT (AutoIncrement PK 생성됨)
+        ReviewDto created = this.iApplyReviewService.applyReview(reviewDto);
+        log.info("[applyReview] 새 reviewId={}", created.getReviewId());
+
+        // 파일 저장 (실제 파일 생성, 파일명 리턴됨)
+        String filePath = this.fileSave.setFileStore(reviews, created.getReviewId());
+        log.info("[applyReview] 저장된 파일명(filePath)={}", filePath);
+
+        // DB update (codePath 세팅)
+        Map<Object, Object> params = new HashMap<>();
+        params.put("reviewId", created.getReviewId());
+        params.put("reviewCodePath", filePath);
+
+        int updated = this.iApplyReviewService.updateCodePath(params);
+        log.info("[applyReview] updateCodePath 결과: updated={}, reviewId={}, codePath={}",
+                 updated, created.getReviewId(), filePath);
+
+        // DTO에도 반영
+        created.setReviewCodePath(filePath);
+
+        CreateReviewResponseModel returnValue =
+                this.modelMapper.map(created, CreateReviewResponseModel.class);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(returnValue);
     }
 
