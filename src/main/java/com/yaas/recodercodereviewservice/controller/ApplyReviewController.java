@@ -15,6 +15,7 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.io.IOException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -67,7 +68,7 @@ public class ApplyReviewController {
         log.info("[applyReview] 저장된 파일명(filePath)={}", filePath);
 
         // DB update (codePath 세팅)
-        Map<Object, Object> params = new HashMap<>();
+        Map<String, Object> params = new HashMap<>();
         params.put("reviewId", created.getReviewId());
         params.put("reviewCodePath", filePath);
 
@@ -83,33 +84,38 @@ public class ApplyReviewController {
         return ResponseEntity.status(HttpStatus.CREATED).body(returnValue);
     }
 
-    @PostMapping({"/file"})
-    public ResponseEntity<CreateReviewFileResponseModel> applyReviewFile(@ModelAttribute Reviews reviews, @RequestParam("file") MultipartFile file) {
-        this.modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-        ReviewDto reviewDto = (ReviewDto)this.modelMapper.map(reviews, ReviewDto.class);
-
+    @PostMapping("/file")
+    public ResponseEntity<?> applyReviewFile(@RequestParam("file") MultipartFile file,
+                                             Reviews reviews) {
         try {
-            this.filename = file.getOriginalFilename();
-            System.out.println("파일은? " + file + " >> 파일이름은? " + this.filename);
-            String codePath;
-            if (reviews.getReviewLanguage() == 0) {
-                codePath = "/usr/src/recoder/java/";
-                file.transferTo(new File(codePath + reviews.getMenteeId() + "_" + this.filename));
-            } else if (reviews.getReviewLanguage() == 1) {
-                codePath = "/usr/src/recoder/c/";
-                file.transferTo(new File(codePath + reviews.getMenteeId() + "_" + this.filename));
-            } else {
-                codePath = "/usr/src/recoder/cpp/";
-                file.transferTo(new File(codePath + reviews.getMenteeId() + "_" + this.filename));
-            }
-        } catch (Exception var6) {
-            var6.printStackTrace();
-        }
+            ReviewDto created = iApplyReviewService.applyReview(
+                    modelMapper.map(reviews, ReviewDto.class)
+            );
 
-        reviewDto.setReviewCodePath(this.filename);
-        ReviewDto createReviewDto = this.iApplyReviewService.applyReview(reviewDto);
-        CreateReviewFileResponseModel returnValue = (CreateReviewFileResponseModel)this.modelMapper.map(createReviewDto, CreateReviewFileResponseModel.class);
-        return ResponseEntity.status(HttpStatus.CREATED).body(returnValue);
+            String storedFileName = reviews.getMenteeId() + "_" + file.getOriginalFilename();
+
+            String codeDir = "/usr/src/recoder/";
+            if (reviews.getReviewLanguage() == 1) codeDir += "c/";
+            else if (reviews.getReviewLanguage() == 2) codeDir += "cpp/";
+            else codeDir += "java/";
+
+            File dest = new File(codeDir + storedFileName);
+            file.transferTo(dest);
+
+            Map<String, Object> params = new HashMap<>();
+            params.put("reviewId", created.getReviewId());
+            params.put("reviewCodePath", storedFileName);
+            iApplyReviewService.updateCodePath(params);
+
+            created.setReviewCodePath(storedFileName);
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(created);
+
+        } catch (IOException | IllegalStateException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                 .body("파일 저장 실패: " + e.getMessage());
+        }
     }
 
     @GetMapping({"/linux/{reviewId}"})

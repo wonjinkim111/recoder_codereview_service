@@ -6,7 +6,7 @@ import java.util.Map;
 public interface IApplyReviewService {
     ReviewDto applyReview(ReviewDto reviewDto);
 
-    int updateCodePath(Map<Object, Object> updateCodePathMap);
+    int updateCodePath(Map<String, Object> updateCodePathMap);
 
     ReviewDto getApplyReview(long reviewId);
 }

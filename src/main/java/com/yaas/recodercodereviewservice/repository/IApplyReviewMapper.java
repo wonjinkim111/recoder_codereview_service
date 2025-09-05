@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 public interface IApplyReviewMapper {
     int applyReview(Reviews reviews);
 
-    int updateCodePath(Map<Object, Object> updateCodePathMap);
+    int updateCodePath(Map<String, Object> updateCodePathMap);
 
     ReviewDto getApplyReview(long reviewId);
 }
