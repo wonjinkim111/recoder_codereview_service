@@ -100,7 +100,16 @@ public class ApplyReviewController {
             else codeDir += "java/";
 
             File dest = new File(codeDir + storedFileName);
+
+            // 실제 저장 시도
             file.transferTo(dest);
+
+            // 저장 후 파일 존재 여부 확인 로그
+            if (dest.exists()) {
+                System.out.println("✅ 파일 저장 성공: " + dest.getAbsolutePath() + " (크기: " + dest.length() + " bytes)");
+            } else {
+                System.out.println("❌ 파일 저장 실패: " + dest.getAbsolutePath());
+            }
 
             Map<String, Object> params = new HashMap<>();
             params.put("reviewId", created.getReviewId());
