@@ -21,7 +21,8 @@ public class CompileProcess3 {
         BufferedReader errorBufferReader = null;
         String msg = "";
         String resultMessage = "";
-        List<String> cmdList = new ArrayList();
+        List<String> cmdList = new ArrayList<>();
+
         if (System.getProperty("os.name").indexOf("Windows") > -1) {
             cmdList.add("cmd");
             cmdList.add("/c");
@@ -33,67 +34,59 @@ public class CompileProcess3 {
         int idx = fileName.indexOf(".");
         String idxResult = fileName.substring(0, idx);
         String language = fileName.substring(idx);
-        System.out.println(language);
         String tmpCmd = "";
+
         if (language.equals(".java")) {
-            tmpCmd = "javac C:/recoder/recoder-code/" + fileName + " -encoding UTF-8&&cd ..&&cd recoder-code&java " + idxResult;
-            System.out.println("java 뭐가 나오는건가 이 배열은 \n" + tmpCmd.toString());
+            // 리눅스 컨테이너 경로 기반
+            tmpCmd = "cd /usr/src/recoder/java && javac -encoding UTF-8 " + fileName +
+                     " && java " + idxResult;
+            System.out.println("java cmd: " + tmpCmd);
         } else if (language.equals(".c")) {
-            tmpCmd = "gcc -o recoder C:/recoder/recoder-code/" + fileName + "&&recoder";
-            System.out.println("c 뭐가 나오는건가 이 배열은 \n" + tmpCmd.toString());
-        } else {
-            tmpCmd = "g++ -o recoder C:/recoder/recoder-code/" + fileName + " -O2 -Wall -lm -static -std=gnu++98&&recoder";
-            System.out.println("cpp 뭐가 나오는건가 이 배열은 \n" + tmpCmd.toString());
+            tmpCmd = "cd /usr/src/recoder/c && gcc -o " + idxResult + " " + fileName +
+                     " && ./" + idxResult;
+            System.out.println("c cmd: " + tmpCmd);
+        } else if (language.equals(".cpp")) {
+            tmpCmd = "cd /usr/src/recoder/cpp && g++ -o " + idxResult + " " + fileName +
+                     " -O2 -Wall -lm -static -std=gnu++98 && ./" + idxResult;
+            System.out.println("cpp cmd: " + tmpCmd);
         }
 
         cmdList.add(tmpCmd);
-        String[] array = (String[])cmdList.toArray(new String[cmdList.size()]);
+        String[] array = cmdList.toArray(new String[cmdList.size()]);
 
         try {
             process = runtime.exec(array);
-            successBufferReader = new BufferedReader(new InputStreamReader(process.getInputStream(), "MS949"));
 
-            while((msg = successBufferReader.readLine()) != null) {
-                successOutput.append(msg + System.getProperty("line.separator"));
+            // 리눅스는 기본 UTF-8
+            successBufferReader = new BufferedReader(new InputStreamReader(process.getInputStream(), "UTF-8"));
+            while ((msg = successBufferReader.readLine()) != null) {
+                successOutput.append(msg).append(System.lineSeparator());
             }
 
-            errorBufferReader = new BufferedReader(new InputStreamReader(process.getErrorStream(), "MS949"));
-
-            while((msg = errorBufferReader.readLine()) != null) {
-                errorOutput.append(msg + System.getProperty("line.separator"));
+            errorBufferReader = new BufferedReader(new InputStreamReader(process.getErrorStream(), "UTF-8"));
+            while ((msg = errorBufferReader.readLine()) != null) {
+                errorOutput.append(msg).append(System.lineSeparator());
             }
 
             process.waitFor();
             if (process.exitValue() == 0) {
-                System.out.println("성공");
-                resultMessage = resultMessage + successOutput.toString();
-                System.out.println(resultMessage);
+                resultMessage = successOutput.toString();
+                System.out.println("성공: \n" + resultMessage);
             } else {
-                System.out.println("비정상 종료");
-                System.out.println(successOutput.toString());
-                resultMessage = resultMessage + errorOutput.toString();
-                System.out.println(resultMessage);
+                resultMessage = errorOutput.toString();
+                System.out.println("비정상 종료: \n" + resultMessage);
             }
-        } catch (IOException var26) {
-            var26.printStackTrace();
-        } catch (InterruptedException var27) {
-            var27.printStackTrace();
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
         } finally {
             try {
-                process.destroy();
-                if (successBufferReader != null) {
-                    successBufferReader.close();
-                }
-
-                if (errorBufferReader != null) {
-                    errorBufferReader.close();
-                }
-            } catch (IOException var25) {
-                var25.printStackTrace();
+                if (process != null) process.destroy();
+                if (successBufferReader != null) successBufferReader.close();
+                if (errorBufferReader != null) errorBufferReader.close();
+            } catch (IOException e1) {
+                e1.printStackTrace();
             }
-
         }
-
         return resultMessage;
     }
 }
