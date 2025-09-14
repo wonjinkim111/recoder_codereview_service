@@ -84,49 +84,113 @@ public class ApplyReviewController {
         return ResponseEntity.status(HttpStatus.CREATED).body(returnValue);
     }
 
-    @PostMapping("/file")
-    public ResponseEntity<?> applyReviewFile(@RequestParam("file") MultipartFile file,
-                                             Reviews reviews) {
+    @PostMapping({"/file"})
+    public ResponseEntity<CreateReviewFileResponseModel> applyReviewFile(
+            @ModelAttribute Reviews reviews,
+            @RequestParam("file") MultipartFile file) {
+
+        this.modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        ReviewDto reviewDto = this.modelMapper.map(reviews, ReviewDto.class);
+
         try {
-            ReviewDto created = iApplyReviewService.applyReview(
-                    modelMapper.map(reviews, ReviewDto.class)
-            );
+            this.filename = file.getOriginalFilename();
+            log.info("[applyReviewFile] 업로드된 파일명(original)={}", this.filename);
 
-            String storedFileName = reviews.getMenteeId() + "_" + file.getOriginalFilename();
-
-            String codeDir = "/usr/src/recoder/";
-            if (reviews.getReviewLanguage() == 1) codeDir += "c/";
-            else if (reviews.getReviewLanguage() == 2) codeDir += "cpp/";
-            else codeDir += "java/";
-
-            File dest = new File(codeDir + storedFileName);
-
-            // 실제 저장 시도
-            file.transferTo(dest);
-
-            // 저장 후 파일 존재 여부 확인 로그
-            if (dest.exists()) {
-                System.out.println("✅ 파일 저장 성공: " + dest.getAbsolutePath() + " (크기: " + dest.length() + " bytes)");
+            String codePath;
+            if (reviews.getReviewLanguage() == 0) {
+                codePath = "/usr/src/recoder/java/";
+            } else if (reviews.getReviewLanguage() == 1) {
+                codePath = "/usr/src/recoder/c/";
             } else {
-                System.out.println("❌ 파일 저장 실패: " + dest.getAbsolutePath());
+                codePath = "/usr/src/recoder/cpp/";
             }
 
-            Map<String, Object> params = new HashMap<>();
-            params.put("reviewId", created.getReviewId());
-            params.put("reviewCodePath", storedFileName);
-            iApplyReviewService.updateCodePath(params);
+            String fullPath = codePath + reviews.getMenteeId() + "_" + this.filename;
+            file.transferTo(new File(fullPath));
 
-            created.setReviewCodePath(storedFileName);
+            log.info("[applyReviewFile] 실제 저장 경로={}", fullPath);
 
-            return ResponseEntity.status(HttpStatus.CREATED).body(created);
-
-        } catch (IOException | IllegalStateException e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                 .body("파일 저장 실패: " + e.getMessage());
+        } catch (Exception e) {
+            log.error("[applyReviewFile] 파일 저장 실패", e);
         }
-    }
 
+        reviewDto.setReviewCodePath(this.filename);
+        log.info("[applyReviewFile] DB에 저장될 reviewCodePath={}", this.filename);
+
+        ReviewDto createReviewDto = this.iApplyReviewService.applyReview(reviewDto);
+        CreateReviewFileResponseModel returnValue =
+                this.modelMapper.map(createReviewDto, CreateReviewFileResponseModel.class);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(returnValue);
+    }
+    /*
+    @PostMapping({"/file"})
+    public ResponseEntity<CreateReviewFileResponseModel> applyReviewFile(
+            @ModelAttribute Reviews reviews,
+            @RequestParam("file") MultipartFile file) {
+
+        this.modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        ReviewDto reviewDto = this.modelMapper.map(reviews, ReviewDto.class);
+
+        try {
+            this.filename = file.getOriginalFilename();
+            log.info("[applyReviewFile] 업로드된 파일명(original)={}", this.filename);
+
+            String codePath;
+            if (reviews.getReviewLanguage() == 0) {
+                codePath = "/usr/src/recoder/java/";
+            } else if (reviews.getReviewLanguage() == 1) {
+                codePath = "/usr/src/recoder/c/";
+            } else {
+                codePath = "/usr/src/recoder/cpp/";
+            }
+
+            String fullPath = codePath + reviews.getMenteeId() + "_" + this.filename;
+            file.transferTo(new File(fullPath));
+
+            log.info("[applyReviewFile] 실제 저장 경로={}", fullPath);
+
+        } catch (Exception e) {
+            log.error("[applyReviewFile] 파일 저장 실패", e);
+        }
+
+        reviewDto.setReviewCodePath(this.filename);
+        log.info("[applyReviewFile] DB에 저장될 reviewCodePath={}", this.filename);
+
+        ReviewDto createReviewDto = this.iApplyReviewService.applyReview(reviewDto);
+        CreateReviewFileResponseModel returnValue =
+                this.modelMapper.map(createReviewDto, CreateReviewFileResponseModel.class);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(returnValue);
+    } */
+
+    @GetMapping({"/linux/{reviewId}"})
+    @ResponseBody
+    public ReviewDto getReview(@PathVariable long reviewId) {
+        log.info("[getReview] 요청된 reviewId={}", reviewId);
+
+        this.modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        this.getReviewDto = this.iApplyReviewService.getApplyReview(reviewId);
+
+        String finalPath;
+        if (this.getReviewDto.getReviewLanguage() == 0) {
+            finalPath = "/usr/src/recoder/java/" + this.getReviewDto.getReviewCodePath();
+        } else if (this.getReviewDto.getReviewLanguage() == 1) {
+            finalPath = "/usr/src/recoder/c/" + this.getReviewDto.getReviewCodePath();
+        } else {
+            finalPath = "/usr/src/recoder/cpp/" + this.getReviewDto.getReviewCodePath();
+        }
+
+        String getFile = this.fileGet.getFile(finalPath);
+        log.info("[getReview] 최종 파일 조회 경로={}, 파일 읽기 결과 길이={}",
+                finalPath, (getFile != null ? getFile.length() : "null"));
+
+        this.getReviewDto.setReviewCode(getFile);
+        this.returnValue = this.modelMapper.map(this.getReviewDto, GetReviewResponseModel.class);
+
+        return this.getReviewDto;
+    }
+    /*
     @GetMapping({"/linux/{reviewId}"})
     @ResponseBody
     public ReviewDto getReview(@PathVariable long reviewId) {
@@ -151,8 +215,34 @@ public class ApplyReviewController {
 
         this.returnValue = (GetReviewResponseModel)this.modelMapper.map(this.getReviewDto, GetReviewResponseModel.class);
         return this.getReviewDto;
-    }
+    } */
 
+    @GetMapping({"/{reviewId}"})
+    @ResponseBody
+    public ReviewDto getReviewLinux(@PathVariable long reviewId) {
+        log.info("[getReviewLinux] 요청된 reviewId={}", reviewId);
+
+        this.modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        this.getReviewDto = this.iApplyReviewService.getApplyReview(reviewId);
+
+        String finalPath = "";
+        if (this.getReviewDto.getReviewLanguage() == 0) {
+            finalPath = "/usr/src/recoder/java/" + this.getReviewDto.getReviewCodePath();
+        } else if (this.getReviewDto.getReviewLanguage() == 1) {
+            finalPath = "/usr/src/recoder/c/" + this.getReviewDto.getReviewCodePath();
+        } else {
+            finalPath = "/usr/src/recoder/cpp/" + this.getReviewDto.getReviewCodePath();
+        }
+
+        String getFile = this.fileGet.getFile(finalPath);
+        log.info("[getReviewLinux] 최종 파일 조회 경로={}, reviewId={}", finalPath, reviewId);
+
+        this.getReviewDto.setReviewCode(getFile);
+        this.returnValue = this.modelMapper.map(this.getReviewDto, GetReviewResponseModel.class);
+
+        return this.getReviewDto;
+    }
+    /*
     @GetMapping({"/{reviewId}"})
     @ResponseBody
     public ReviewDto getReviewLinux(@PathVariable long reviewId) {
@@ -178,5 +268,5 @@ public class ApplyReviewController {
         this.getReviewDto.setReviewCode(getFile);
         this.returnValue = (GetReviewResponseModel)this.modelMapper.map(this.getReviewDto, GetReviewResponseModel.class);
         return this.getReviewDto;
-    }
+    } */
 }
