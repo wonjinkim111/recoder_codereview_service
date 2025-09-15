@@ -21,8 +21,8 @@ public class CompileProcess3 {
         BufferedReader errorBufferReader = null;
         String msg = "";
         String resultMessage = "";
+        
         List<String> cmdList = new ArrayList<>();
-
         if (System.getProperty("os.name").indexOf("Windows") > -1) {
             cmdList.add("cmd");
             cmdList.add("/c");
@@ -40,15 +40,15 @@ public class CompileProcess3 {
             // 리눅스 컨테이너 경로 기반
             tmpCmd = "cd /usr/src/recoder/java && javac -encoding UTF-8 " + fileName +
                      " && java " + idxResult;
-            System.out.println("java cmd: " + tmpCmd);
+            System.out.println("[java cmd] " + tmpCmd);
         } else if (language.equals(".c")) {
             tmpCmd = "cd /usr/src/recoder/c && gcc -o " + idxResult + " " + fileName +
                      " && ./" + idxResult;
-            System.out.println("c cmd: " + tmpCmd);
+            System.out.println("[c cmd] " + tmpCmd);
         } else if (language.equals(".cpp")) {
             tmpCmd = "cd /usr/src/recoder/cpp && g++ -o " + idxResult + " " + fileName +
                      " -O2 -Wall -lm -static -std=gnu++98 && ./" + idxResult;
-            System.out.println("cpp cmd: " + tmpCmd);
+            System.out.println("[cpp cmd] " + tmpCmd);
         }
 
         cmdList.add(tmpCmd);
