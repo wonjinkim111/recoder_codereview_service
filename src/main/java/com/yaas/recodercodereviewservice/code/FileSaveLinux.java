@@ -18,41 +18,36 @@ public class FileSaveLinux {
     }
 
     public String setFileStore(Reviews reviews, long reviewId) {
-        log.info(String.format("< FileSave class >"));
+        log.info(String.format("< FileSave class >", new Object[0]));
         String fileName = "";
         String timeStamp = (new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss")).format(new Date());
-
         try {
-            BufferedWriter fw;
-            if (reviews.getReviewLanguage() == 0) {
-                fileName = "Recoder" + reviewId + "_" + reviews.getMenteeId() + "_" + timeStamp + ".java";
-                fw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("/usr/src/recoder/java/" + fileName), "UTF-8"));
-                this.writer(reviews, fw);
-            } else if (reviews.getReviewLanguage() == 1) {
-                fileName = reviewId + "_" + reviews.getMenteeId() + "_" + timeStamp + ".c";
-                fw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("/usr/src/recoder/c/" + fileName), "UTF-8"));
-                //fw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("C:\\Users\\diffr\recoder" + fileName), "UTF-8"));
-                this.writer(reviews, fw);
-            } else {
-                fileName = reviewId + "_" + reviews.getMenteeId() + "_" + timeStamp + ".cpp";
-                fw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("/usr/src/recoder/cpp/" + fileName), "UTF-8"));
-                this.writer(reviews, fw);
-            }
-        } catch (Exception var7) {
-            var7.printStackTrace();
-        }
-
+          if (reviews.getReviewLanguage() == 0) {
+            fileName = "Recoder" + reviewId + "_" + reviews.getMenteeId() + "_" + timeStamp + ".java";
+            BufferedWriter fw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("/usr/src/recoder/java/" + fileName), "UTF-8"));
+            writer(reviews, fw);
+          } else if (reviews.getReviewLanguage() == 1) {
+            fileName = reviewId + "_" + reviews.getMenteeId() + "_" + timeStamp + ".c";
+            BufferedWriter fw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("/usr/src/recoder/c/" + fileName), "UTF-8"));
+            writer(reviews, fw);
+          } else {
+            fileName = reviewId + "_" + reviews.getMenteeId() + "_" + timeStamp + ".cpp";
+            BufferedWriter fw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("/usr/src/recoder/cpp/" + fileName), "UTF-8"));
+            writer(reviews, fw);
+          } 
+        } catch (Exception e) {
+          e.printStackTrace();
+        } 
         return fileName;
-    }
-
-    public void writer(Reviews reviews, BufferedWriter fw) {
+      }
+      
+      public void writer(Reviews reviews, BufferedWriter fw) {
         try {
-            fw.write(reviews.getReviewCode());
-            fw.flush();
-            fw.close();
-        } catch (Exception var4) {
-            var4.printStackTrace();
-        }
-
-    }
+          fw.write(reviews.getReviewCode());
+          fw.flush();
+          fw.close();
+        } catch (Exception e) {
+          e.printStackTrace();
+        } 
+      }
 }
